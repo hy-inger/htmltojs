@@ -1,5 +1,8 @@
 # htmltojs
 
+
+
+
 > The html minify use the [html-minifier](https://github.com/kangax/html-minifier)
 
 
@@ -17,9 +20,23 @@ npm install htmltojs -g;
 htmltojs -f input_file -o output_file [label1,label2]
 ```
 
-- `-f input_file`: `required`. The file that you want to confuse to, don't begin with '/', eg: `index.html`; `tpl/test.html`.No matter where the parameter is placed, just with `-f`.<br/><br/>
-- `-o out_file`: `optional`. The file that you want to output the results to,  if the params is empty, the results will output to the `current directory`(where you run the cammand) named `htmltojs.html`. No matter where the parameter is placed, just with `-o`.<br/><br/>
-- `[label]`: `optional`. The labels that you want to conflicts only, label of the same can't nest, or would cause error. No matter where the parameter is placed, as long as the format is an `array`.
+- `-f input_file`:  `required`. The file that you want to confuse to.
+    - Don't begin with '/', eg: `index.html`; `tpl/test.html`.
+    - No matter where the parameter is placed, just with `-f`.
+
+<br/>
+
+- `-o out_file`:  `optional`. The file that you want to output the results to.
+    - If the params is empty, the results will output to the `current directory`(where you run the cammand) named `htmltojs.html`. 
+    - No matter where the parameter is placed, just with `-o`.
+
+<br/>
+
+- `[label]`:  `optional`. The labels that you want to conflicts only.
+    - Label of the same can't nest, or would cause error.
+    - Do not add attributes to the label.
+    - The label  will be `removed` after operate.
+    - No matter where the parameter is placed, as long as the format is an `array`.
 
 
 ###history:
