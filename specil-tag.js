@@ -2,16 +2,14 @@
 var readfile=require("fs"),
         path = process.cwd(),                     // 获取执行该命令的文件路径
         arguments = process.argv,           // 获取该命令参数，第一个为node，第二个为命令的脚本文件，第三个起即为自定义参数。
-        input = arguments[2],                   // 输入文件
+        input = arguments[arguments.indexOf('-f')+1],      // 输入文件
         tags = [],                                           // 对指定标签中的内容进行混淆
-        writefile = 'htmltojs.html';                                      // 结果输出文件
+        writefile = arguments.indexOf('-o')>0?arguments[arguments.indexOf('-o')+1]:'htmltojs.html';                                      // 结果输出文件
 
-for(var i=3,l=arguments.length;i<l;i++){
+for(var i=2,l=arguments.length;i<l;i++){
     var value = arguments[i];
     if(value && !!~value.indexOf('[')){                              // 指定标签以数组形式输入
         tags = value.substring(1,value.length-1).split(',');
-    } else {
-        writefile = value || 'htmltojs.html';
     }
 }
 
@@ -36,12 +34,30 @@ function scanInputString(tag,input,output){
     if(!!~(self_closing.indexOf(tag))){
         tag_end_index = input.indexOf('/>')  + 1;
     } else { 
-        tag_end_index = input.indexOf('</'+tag+'>') + tag.length + 2;
+        tag_end_index = input.indexOf('</'+tag+'>');
     }
+
     output += input.substring(0,tag_start_index);
     // 标签转换内容
-    var tag_output = '',offset_ary = [];
-    for (var i=tag_start_index; i < tag_end_index+1; i++){
+    var result = toHex(tag_start_index+tag.length+2,tag_end_index-1,input),
+    tag_output = result.output||'',
+    offset_ary = result.offset_ary||[];
+
+    var formatted_output = displayOutput(tag_output,offset_ary,tag_start_index);
+    output += formatted_output;
+
+    var left_string  = input.substring(tag_end_index+tag.length+3,input.length);
+    if(left_string.length){
+        return scanInputString(tag,left_string,output);
+    } else {
+        return output;
+    }
+
+}
+/* 将字符转为十六进制数据 */
+function toHex(start_index,length,input){
+    var output = '',offset_ary = [];
+    for (var i=start_index; i < length; i++){
         charcode = input.charCodeAt(i),
         offset = parseInt(Math.random()*(126-charcode)),              // 随机生成的偏移量与字符ASCII值相加不超过126。
         offset_code = charcode + offset;
@@ -51,20 +67,15 @@ function scanInputString(tag,input,output){
             hex = '0'+hex;                              // 补充十六进制数据为两位数
         }
 
-        tag_output += hex;
+        output += hex;
         offset_ary.push(offset);                                        // 保存偏移量，用于对ASCII码值进行恢复。
     }
-    var formatted_output = displayOutput(tag_output,offset_ary,tag_start_index);
-    output += formatted_output;
-
-    var left_string  = input.substring(tag_end_index+1,input.length);
-    if(left_string.length){
-        return scanInputString(tag,left_string,output);
-    } else {
-        return output;
+    return {
+        output:output,
+        offset_ary:offset_ary,
     }
-
 }
+
 /* 
 ** 获取每个字符的ASCII值(charcode)，随机生成一个偏移量(offset)，返回该ASCII值+偏移量(offset_code)的十六进制数据。
 */
@@ -80,19 +91,10 @@ function htmltojs(inputString){
         }
         outputString = inputString;
     } else {                                                                    // 没有指定标签，对整个文档进行转换。
-        for (var i=0; i < inputString.length; i++){
-            charcode = inputString.charCodeAt(i),
-            offset = parseInt(Math.random()*(126-charcode)),              // 随机生成的偏移量与字符ASCII值相加不超过126。
-            offset_code = charcode + offset;
+        var result = toHex(0,inputString.length,inputString),
+        outputString = result.output,
+        offset_ary = result.offset_ary;
 
-            var hex = offset_code.toString(16);
-            if(hex.length<=1){
-                hex = '0'+hex;                              // 补充十六进制数据为两位数
-            }
-
-            outputString += hex;
-            offset_ary.push(offset);                                        // 保存偏移量，用于对ASCII码值进行恢复。
-        }
         outputString = displayOutput(outputString,offset_ary,0);
     }
     return outputString;

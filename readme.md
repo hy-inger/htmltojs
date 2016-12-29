@@ -23,5 +23,8 @@ htmltojs input_file output_file [tag]
 
 ###history:
 
-- 2016-12-28 Support for confusing specified tags
+- 2016-12-28-v0.4.x Support for confusing specified tags
+- 2016-12-27-v0.3.x The character ACSII code value + random offset into hexadecimal numerical output
+- 2016-12-23-v0.2.x Change the character to the ASCII value + 1 to the character to the random ASCII value character
+- 2016-12-22-v0.1.x The character is converted to ASCII character value + 1 
 
