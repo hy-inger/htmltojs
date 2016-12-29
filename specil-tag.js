@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 var readfile=require("fs"),
+        minify = require('html-minifier').minify,           // 压缩html模块
         path = process.cwd(),                     // 获取执行该命令的文件路径
         arguments = process.argv,           // 获取该命令参数，第一个为node，第二个为命令的脚本文件，第三个起即为自定义参数。
         input = arguments[arguments.indexOf('-f')+1],      // 输入文件
@@ -15,8 +16,25 @@ for(var i=2,l=arguments.length;i<l;i++){
 
 var self_closing = ['area','base','br','col','command','embed','hr','img','input','meta','param','source','track','wbr'];       // 自闭合标签
 var content = readfile.readFileSync(path+'/'+input,"utf-8");          // 同步读取文件
+
 var output = htmltojs(content);                                                      // 对文件进行混淆
+output = minify(output,{                                                                    // 对数据进行压缩
+    collapseBooleanAttributes:true,
+    collapseWhitespace:true,
+    decodeEntities:true,
+    minifyCSS:true,
+    minifyJS:true,
+    processConditionalComments:true,
+    removeComments:true,
+    removeEmptyAttributes:true,
+    removeOptionalTags:true,
+    removeRedundantAttributes:true,
+    removeScriptTypeAttributes:true,
+    removeStyleLinkTypeAttributes:true,
+    trimCustomFragments:true,
+})
 readfile.writeFile(path+'/'+writefile,output);                                  // 输出结果至指定文件
+
 
 
 /* 对输入文件进行遍历查找标签，使用递归查找重复出现的标签 ，对标签内容进行替换。
@@ -75,6 +93,26 @@ function toHex(start_index,length,input){
         offset_ary:offset_ary,
     }
 }
+/* 将结果封装成script脚本输出 */
+function displayOutput(jsOutput, offset_ary,id){
+    formattedOutput = "<sc" + "ript type=\'text/javascript\' id=\'scr"+"ipt"+id+"\'>" +
+                      "var s=\"" +  jsOutput + "\"," + 
+                      "m=\"\", " +
+                      "offset_ary =  ["+ offset_ary+
+                      "];" + 
+                      "for (i=0,j=0; i<s.length,j<offset_ary.length;j++, i = i+2) {" +
+                      " var offset = offset_ary[j]," +
+                      " hex = s[i] + s[i+1]," + 
+                      " charcode = parseInt(hex,16);" +  
+                      " m+=String.fromCharCode(charcode - offset);" +
+                      "}" +
+                      "document.write(m);" +
+                      "var script= document.getElementById(\'script"+id+"\');"+
+                      "script.parentNode.removeChild(script);"+
+                      "</s" + "cript>";
+                      
+    return formattedOutput;                 
+}
 
 /* 
 ** 获取每个字符的ASCII值(charcode)，随机生成一个偏移量(offset)，返回该ASCII值+偏移量(offset_code)的十六进制数据。
@@ -100,23 +138,5 @@ function htmltojs(inputString){
     return outputString;
 }
 
-function displayOutput(jsOutput, offset_ary,id){
-    formattedOutput = "<sc" + "ript type=\'text/javascript\' id=\'scr"+"ipt"+id+"\'>" +
-                      "var s=\"" +  jsOutput + "\"," + 
-                      "m=\"\", " +
-                      "offset_ary =  ["+ offset_ary+
-                      "];" + 
-                      "for (i=0,j=0; i<s.length,j<offset_ary.length;j++, i = i+2) {" +
-                      " var offset = offset_ary[j]," +
-                      " hex = s[i] + s[i+1]," + 
-                      " charcode = parseInt(hex,16);" +  
-                      " m+=String.fromCharCode(charcode - offset);" +
-                      "}" +
-                      "document.write(m);" +
-                      "var script= document.getElementById(\'script"+id+"\');"+
-                      "script.parentNode.removeChild(script);"+
-                      "</s" + "cript>";
-                      
-    return formattedOutput;                 
-}
+
 
