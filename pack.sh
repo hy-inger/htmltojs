@@ -1,1 +1,0 @@
-node ./tobase64.js -f ./test/index.html [meta]
