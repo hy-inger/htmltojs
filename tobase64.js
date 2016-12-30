@@ -78,7 +78,7 @@ function displayOutput(jsOutput,id){
     formattedOutput = "<sc" + "ript type=\'text/javascript\' id=\'scr"+"ipt"+id+"\'>" +
                       "var b = "+decode+  
                       ",s=\"" +  jsOutput + "\"," +
-                      "m= b(s); console.log(m);" + 
+                      "m= b(s);" + 
                       "document.write(m);" +
                       "var script= document.getElementById(\'script"+id+"\');"+
                       "script.parentNode.removeChild(script);"+
