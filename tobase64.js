@@ -5,9 +5,16 @@ var readfile=require("fs"),
         decode = require('./lib/base64').decode,            // base64解码
         path = process.cwd(),                     // 获取执行该命令的文件路径
         arguments = process.argv,           // 获取该命令参数，第一个为node，第二个为命令的脚本文件，第三个起即为自定义参数。
-        input = arguments[arguments.indexOf('-f')+1],      // 输入文件
         tags = [],                                           // 对指定标签中的内容进行混淆
-        writefile = arguments.indexOf('-o')>0?arguments[arguments.indexOf('-o')+1]:'htmltojs.html';                                      // 结果输出文件
+        input,writefile;
+// 判断参数是否正确
+var input_f = arguments.indexOf('-f');
+if(input_f<0){
+    console.log('Error! The parameter -f is missing!');
+    return;
+}
+input = arguments[arguments.indexOf('-f')+1],      // 输入文件
+writefile = arguments.indexOf('-o')>0?arguments[arguments.indexOf('-o')+1]:'htmltojs.html';            // 结果输出文件
 
 for(var i=2,l=arguments.length;i<l;i++){
     var value = arguments[i];
