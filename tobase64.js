@@ -17,10 +17,7 @@ for(var i=2,l=arguments.length;i<l;i++){
 }
 
 var self_closing = ['area','base','br','col','command','embed','hr','img','input','meta','param','source','track','wbr'];       // 自闭合标签
-var content = readfile.readFileSync(path+'/'+input,"utf-8");          // 同步读取文件
-var output = htmltojs(content);                                                      // 对文件进行混淆
-
-output = minify(output,{                                                                    // 对数据进行压缩
+var options = {                                                                    // 压缩参数
     collapseBooleanAttributes:true,
     collapseWhitespace:true,
     decodeEntities:true,
@@ -34,7 +31,12 @@ output = minify(output,{                                                        
     removeScriptTypeAttributes:true,
     removeStyleLinkTypeAttributes:true,
     trimCustomFragments:true,
-})
+};
+var content = readfile.readFileSync(path+'/'+input,"utf-8");          // 同步读取文件
+var output = htmltojs(content);                                                      // 对文件进行混淆
+
+output = minify(output,options)                                            // 对数据进行压缩
+
 readfile.writeFile(path+'/'+writefile,output);                                  // 输出结果至指定文件
 
 
@@ -59,7 +61,8 @@ function scanInputString(tag,input,output){
 
     output += input.substring(0,tag_start_index);
     // 标签转换内容
-    var result = base64.encode(input.substring(tag_start_index+tag.length+2,tag_end_index-1));
+    var compress_input = minify(input.substring(tag_start_index+tag.length+2,tag_end_index-1),options);
+    var result = base64.encode(compress_input);
 
     var formatted_output = displayOutput(result,tag_start_index);
     output += formatted_output;
@@ -77,9 +80,8 @@ function scanInputString(tag,input,output){
 function displayOutput(jsOutput,id){
     formattedOutput = "<sc" + "ript type=\'text/javascript\' id=\'scr"+"ipt"+id+"\'>" +
                       "var b = "+decode+  
-                      ",s=\"" +  jsOutput + "\"," +
-                      "m= b(s);" + 
-                      "document.write(m);" +
+                      ";var s=\"" +  jsOutput + "\";" +
+                      "var m= b(s);document.write(m);"+
                       "var script= document.getElementById(\'script"+id+"\');"+
                       "script.parentNode.removeChild(script);"+
                       "</s" + "cript>";
@@ -102,7 +104,8 @@ function htmltojs(inputString){
         }
         outputString = inputString;
     } else {                                                                    // 没有指定标签，对整个文档进行转换。
-        var result = base64.encode(inputString);
+        var compress_input = minify(inputString,options);
+        var result = base64.encode(compress_input);
         outputString = displayOutput(result,0);
     }
     return outputString;

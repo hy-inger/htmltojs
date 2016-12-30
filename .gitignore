@@ -1,3 +1,5 @@
 /node_modules
 pack.sh
+htmltojs.html
+npm-debug.log
 /test
