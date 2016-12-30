@@ -1,1 +1,1 @@
-node ./specil-tag.js -f ./test/index.html [tojs]
+node ./tobase64.js -f ./test/index.html [meta]

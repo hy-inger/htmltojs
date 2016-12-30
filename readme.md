@@ -3,7 +3,7 @@
 
 
 
-> The html minify use the [html-minifier](https://github.com/kangax/html-minifier)
+> This is a tool that confise the HTML file or the tags of specified in the HTML file, and then compress the output file. The html minify use the [html-minifier](https://github.com/kangax/html-minifier)
 
 
 ## Usage
@@ -24,13 +24,11 @@ htmltojs -f input_file -o output_file [label1,label2]
     - Don't begin with '/', eg: `index.html`; `tpl/test.html`.
     - No matter where the parameter is placed, just with `-f`.
 
-<br/>
 
 - `-o out_file`:  `optional`. The file that you want to output the results to.
     - If the params is empty, the results will output to the `current directory`(where you run the cammand) named `htmltojs.html`. 
     - No matter where the parameter is placed, just with `-o`.
 
-<br/>
 
 - `[label]`:  `optional`. The labels that you want to conflicts only.
     - Label of the same can't nest, or would cause error.
@@ -39,9 +37,10 @@ htmltojs -f input_file -o output_file [label1,label2]
     - No matter where the parameter is placed, as long as the format is an `array`.
 
 
-###history:
+### History:
 
-- 2016-12-28-v0.5.x Support for minify html
+- 2016-12-30-v0.6.x Use base64 for characters
+- 2016-12-29-v0.5.x Support for minify html
 - 2016-12-28-v0.4.x Support for confusing specified labels
 - 2016-12-27-v0.3.x The character ACSII code value + random offset into hexadecimal numerical output
 - 2016-12-23-v0.2.x Change the character to the ASCII value + 1 to the character to the random ASCII value character
